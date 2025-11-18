@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "lm-studio": {
+      "command": "python",
+      "args": [
+        "/Users/bytedance/work/author_parser/mcp_server.py"
+      ],
+      "env": {
+        "LM_STUDIO_BASE_URL": "http://127.0.0.1:1234",
+        "LM_STUDIO_MODEL": "openai/gpt-oss-20b"
+      }
+    }
+  }
+}
+
