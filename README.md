@@ -1,60 +1,57 @@
-## Research Intelligence Automation
+## PDF Translation Toolkit
 
-This repository contains a Python workflow for collecting public contact information of leading large-model researchers (e.g., DeepSeek, Anthropic, Google Brain, Tsinghua, PKU) from openly available sources such as arXiv.
+This project now centers on **high‑quality PDF → Chinese translation** powered by a local LM Studio model and an MCP adapter. It extracts text, preserves images, applies multi‑pass LLM QA, and exports either a polished PDF or a Markdown package for downstream editing.
 
-### Key Features
-- Queries arXiv’s API for the latest submissions in configurable categories (default: LLM-related areas).
-- Attempts to extract author emails from arXiv metadata and linked public pages.
-- Normalizes and deduplicates contacts before persisting them to `research_contacts.csv`.
-- Designed to run daily via cron or any scheduler.
+---
 
-### Quick Start
-1. Create and activate a virtual environment.
-2. Install dependencies:
-   ```
+### ✨ Core Features
+- **End‑to‑end PDF translation** (`pdf_translator.py`) with chunked processing, paragraph awareness, and page metadata.
+- **Quality assurance loop**: every chunk is rechecked for mixed languages or prompt artifacts; the model is asked to fix issues automatically.
+- **Image & table preservation**: original figures/screenshots are extracted via PyMuPDF and re‑embedded.  
+- **Flexible output formats**: choose printable PDF or Markdown + assets folder (with MathJax‑ready formulas).
+- **Crash‑safe incremental resume**: translation progress per page/chunk is cached (`*.cache.json`) so you can restart from where it stopped.
+
+---
+
+### 🚀 Quick Start
+1. **Install dependencies**
+   ```bash
    pip install -r requirements.txt
    ```
-3. Run the daily pipeline (example: look back 2 days, dry run disabled):
+2. **Start LM Studio** with the model you want (default `openai/gpt-oss-20b`) and ensure the local API listens on `http://127.0.0.1:1234`.
+3. **Run the translator**
+   ```bash
+   python pdf_translator.py path/to/input.pdf \
+     --format md \
+     -o path/to/output.md
    ```
-   python daily_contacts.py --past-days 2 --csv-path research_contacts.csv
-   ```
+   Options:
+   - `--format pdf|md` (default `pdf`)
+   - `--chunk-size 2000` (tweak if the model struggles with long paragraphs)
+   - `--base-url` / `--model` to point at a different LM Studio endpoint/model.
 
-### Scheduling with Cron
-Add a cron entry (runs every day at 03:00):
-```
-0 3 * * * /usr/bin/env bash -lc 'cd /Users/bytedance/work/author_parser && /usr/bin/env python daily_contacts.py --csv-path /Users/bytedance/work/author_parser/research_contacts.csv >> /Users/bytedance/work/author_parser/cron.log 2>&1'
-```
+---
 
-### Configuration Highlights
-- `--categories`: comma-separated arXiv categories to monitor (defaults cover LLM research).
-- `--target-keywords`: organization keywords that help prioritize relevant authors.
-- `--dry-run`: processes data without touching the CSV for debugging.
-- `--max-results` and `--request-interval`: rate limiting controls to stay polite with public endpoints.
+### 📂 Output Layout
+- **PDF**: `input_translated.pdf`
+- **Markdown**: `input_translated.md` and `input_translated_assets/`  
+  - Formulas like `\(...\)` or `\[...\]` are converted to `$...$` / `$$...$$` for Obsidian, VS Code Preview Enhanced, etc.
+- **Cache**: `input_translated.<format>.cache.json` (auto‑deleted after a clean run; keep it for resume or remove to retranslate).
 
-### Limitations & Next Steps
-- Public arXiv pages rarely expose emails directly; the scraper only records what is openly available.
-- You can extend `source_discovery.py` (future module) to ingest institution directories, lab pages, or social profiles that expose contact info.
-- Consider integrating with a database plus notification system once the CSV workflow stabilizes.
+---
 
-### Repository Layout
-- `daily_contacts.py`: Main pipeline script.
-- `requirements.txt`: Python dependencies.
-- `tests/`: Unit tests covering parsers and utilities.
-- `mcp_server.py`: MCP server for LM Studio API (see [MCP_README.md](MCP_README.md) for details).
+### 🧪 Recommendations
+- Use VS Code + Markdown Preview Enhanced, Obsidian, Typora,或浏览器查看 Markdown 结果以获得最佳渲染效果。
+- 若需将 Markdown 再导出为 EPUB/PDF，可借助 Typora、Calibre (`ebook-convert`)、PrinceXML 或 `pandoc`。
 
-### LM Studio MCP Server
+---
 
-This repository includes an MCP (Model Context Protocol) server that wraps LM Studio's API for local LLM interactions. See [MCP_README.md](MCP_README.md) for detailed documentation.
+### 🔧 Other Utilities
+- `mcp_server.py`: MCP server that wraps LM Studio’s OpenAI‑compatible API. See [MCP_README.md](MCP_README.md) for standalone usage/tests.
+- Legacy scripts like `daily_contacts.py` remain but are no longer the primary focus.
 
-Quick start:
-```bash
-# Install dependencies
-pip install -r requirements.txt
+---
 
-# Run the MCP server
-python mcp_server.py
-
-# Or test the client directly
-python test_mcp_client.py
-```
+### 🤝 Contributing
+Issues and PRs are welcome—this toolkit is evolving toward better formatting recovery (tables, formulas) and faster QA cycles. Feel free to adapt it to your own translation workflows.
 
