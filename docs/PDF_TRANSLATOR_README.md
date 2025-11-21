@@ -1,17 +1,17 @@
-# PDF翻译工具使用说明
+# PDF 翻译工具使用说明
 
-这个工具使用LM Studio MCP服务将PDF文件从英文翻译成中文，并可输出新的PDF或Markdown文档。
+这个工具使用 LM Studio MCP 服务将 PDF 文件从英文翻译成中文，并可输出新的 PDF 或 Markdown 文档。
 
 ## 功能特性
 
-- ✅ 自动提取PDF文件中的文本内容
-- ✅ 智能分块处理长文本，避免超出模型token限制
-- ✅ 使用LM Studio本地大模型进行翻译
+- ✅ 自动提取 PDF 文件中的文本内容
+- ✅ 智能分块处理长文本，避免超出模型 token 限制
+- ✅ 使用 LM Studio 本地大模型进行翻译
 - ✅ 保留原文中的图表/表格图像并插入译文
-- ✅ 可选择输出PDF或Markdown（便于二次排版）
+- ✅ 可选择输出 PDF 或 Markdown（便于二次排版）
 - ✅ 翻译完成后自动触发 LLM 质量审校与修复
 - ✅ 保持原文格式和结构
-- ✅ 生成新的中文PDF文件
+- ✅ 生成新的中文 PDF 文件
 - ✅ 断点续译，翻译进度自动缓存
 
 ## 安装依赖
@@ -23,15 +23,17 @@ pip install -r requirements.txt
 ```
 
 主要依赖包括：
-- `PyMuPDF` (fitz) - 用于PDF文本提取
-- `reportlab` - 用于生成新的PDF文件
-- `mcp` - MCP协议支持
-- `httpx` - HTTP客户端
+
+- `PyMuPDF` (fitz) - 用于 PDF 文本提取
+- `reportlab` - 用于生成新的 PDF 文件
+- `mcp` - MCP 协议支持
+- `httpx` - HTTP 客户端
 
 ## 使用前准备
 
-1. **启动LM Studio服务器**
-   - 打开LM Studio应用
+1. **启动 LM Studio 服务器**
+
+   - 打开 LM Studio 应用
    - 加载模型（默认：`openai/gpt-oss-20b`）
    - 启动本地服务器（默认地址：http://127.0.0.1:1234）
 
@@ -54,21 +56,21 @@ python pdf_translator.py input.pdf
 ### 指定输出文件
 
 ```bash
-python pdf_translator.py input.pdf -o output.pdf
+python -m pdf_translator.main data/input.pdf -o data/output.pdf
 ```
 
 ### 生成 Markdown
 
 ```bash
-python pdf_translator.py input.pdf --format md
+python -m pdf_translator.main data/input.pdf --format md
 ```
 
 这会在同目录生成 `input_translated.md` 与 `input_translated_assets/` 图像目录，方便在笔记或知识库中继续编辑。
 
-### 自定义LM Studio配置
+### 自定义 LM Studio 配置
 
 ```bash
-python pdf_translator.py input.pdf \
+python -m pdf_translator.main data/input.pdf \
   --base-url http://127.0.0.1:1234 \
   --model your-model-name
 ```
@@ -78,10 +80,10 @@ python pdf_translator.py input.pdf \
 如果遇到翻译质量问题，可以调整块大小：
 
 ```bash
-python pdf_translator.py input.pdf --chunk-size 1500
+python -m pdf_translator.main data/input.pdf --chunk-size 1500
 ```
 
-较小的块大小可以提高翻译质量，但会增加API调用次数。
+较小的块大小可以提高翻译质量，但会增加 API 调用次数。
 
 ### 断点续译
 
@@ -101,31 +103,31 @@ python pdf_translator.py input.pdf --chunk-size 1500
 
 ## 参数说明
 
-- `input_pdf`: 输入的PDF文件路径（必需）
+- `input_pdf`: 输入的 PDF 文件路径（必需）
 - `-o, --output`: 输出文件路径（可选，根据 `--format` 自动补齐扩展名）
-- `--base-url`: LM Studio服务器地址（默认：http://127.0.0.1:1234）
+- `--base-url`: LM Studio 服务器地址（默认：http://127.0.0.1:1234）
 - `--model`: 使用的模型名称（默认：openai/gpt-oss-20b）
 - `--chunk-size`: 翻译块大小，单位字符（默认：2000）
 - `--format`: 输出格式，`pdf` 或 `md`（默认：pdf）
 
 ## 工作流程
 
-1. **提取文本**：使用PyMuPDF从PDF中提取所有页面的文本内容
+1. **提取文本**：使用 PyMuPDF 从 PDF 中提取所有页面的文本内容
 2. **分块处理**：将长文本智能分割成适合翻译的块
-3. **翻译**：使用LM Studio API逐块翻译文本
+3. **翻译**：使用 LM Studio API 逐块翻译文本
 4. **生成文档**：根据 `--format` 生成 PDF 或 Markdown，Markdown 会同步导出所有图像资源
 
 ## 注意事项
 
-1. **中文字体支持**：工具会尝试自动检测和注册系统中文字体。如果PDF中中文显示异常，可能需要手动安装中文字体。
+1. **中文字体支持**：工具会尝试自动检测和注册系统中文字体。如果 PDF 中中文显示异常，可能需要手动安装中文字体。
 
 2. **翻译质量**：翻译质量取决于使用的模型。建议使用支持中英文翻译的模型。
 
-3. **处理时间**：翻译时间取决于PDF大小和模型速度。大文件可能需要较长时间。
+3. **处理时间**：翻译时间取决于 PDF 大小和模型速度。大文件可能需要较长时间。
 
 4. **格式保持**：工具会尽量保持原文的段落结构，但复杂的排版（如表格、图片等）可能无法完全保留。
 
-5. **API限流**：工具在翻译块之间添加了延迟，避免API限流。如果遇到限流问题，可以增加延迟时间。
+5. **API 限流**：工具在翻译块之间添加了延迟，避免 API 限流。如果遇到限流问题，可以增加延迟时间。
 
 6. **缓存文件**：若翻译被中断，可保留缓存文件以便下次续传；若要重新翻译，请删除对应的 `*.cache.json`。
 
@@ -136,52 +138,55 @@ python pdf_translator.py input.pdf --chunk-size 1500
 
 ```bash
 # 翻译一个PDF文件
-python pdf_translator.py document.pdf
+python -m pdf_translator.main data/document.pdf
 
 # 指定输出文件名
-python pdf_translator.py document.pdf -o 翻译后的文档.pdf
+python -m pdf_translator.main data/document.pdf -o data/翻译后的文档.pdf
 
 # 使用自定义模型
-python pdf_translator.py document.pdf --model deepseek-chat
+python -m pdf_translator.main data/document.pdf --model deepseek-chat
 ```
 
 ## 故障排除
 
-### 问题：无法连接到LM Studio
+### 问题：无法连接到 LM Studio
 
 **解决方案**：
-- 确保LM Studio服务器正在运行
+
+- 确保 LM Studio 服务器正在运行
 - 检查服务器地址和端口是否正确
 - 确认防火墙没有阻止连接
 
-### 问题：PDF中中文显示为方块
+### 问题：PDF 中中文显示为方块
 
 **解决方案**：
-- 安装中文字体（如PingFang、SimSun等）
+
+- 安装中文字体（如 PingFang、SimSun 等）
 - 工具会自动尝试注册常见的中文字体路径
 
 ### 问题：翻译结果不准确
 
 **解决方案**：
+
 - 尝试使用更好的模型
 - 减小 `--chunk-size` 参数值
-- 检查原始PDF文本提取是否完整
+- 检查原始 PDF 文本提取是否完整
 - 删除旧的缓存文件后重新运行，确保不使用过期结果
 
 ### 问题：处理大文件时内存不足
 
 **解决方案**：
+
 - 减小 `--chunk-size` 参数值
-- 分批处理PDF文件
+- 分批处理 PDF 文件
 
 ## 技术细节
 
-- **文本提取**：使用PyMuPDF的`get_text()`方法提取文本
+- **文本提取**：使用 PyMuPDF 的`get_text()`方法提取文本
 - **分块策略**：优先按段落分割，长段落按句子分割
-- **翻译API**：使用LM Studio的OpenAI兼容API
-- **PDF生成**：使用reportlab生成新的PDF文件
+- **翻译 API**：使用 LM Studio 的 OpenAI 兼容 API
+- **PDF 生成**：使用 reportlab 生成新的 PDF 文件
 
 ## 许可证
 
 与主项目保持一致。
-

@@ -4,6 +4,7 @@
 """
 import asyncio
 import json
+import os
 import sys
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
@@ -12,7 +13,7 @@ async def test_mcp_server():
     """测试 MCP 服务器"""
     server_params = StdioServerParameters(
         command="python",
-        args=["/Users/bytedance/work/author_parser/mcp_server.py"],
+        args=[os.path.join(os.path.dirname(os.path.dirname(__file__)), "pdf_translator", "mcp_server.py")],
         env={
             "LM_STUDIO_BASE_URL": "http://127.0.0.1:1234",
             "LM_STUDIO_MODEL": "openai/gpt-oss-20b"

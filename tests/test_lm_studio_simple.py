@@ -2,8 +2,11 @@
 """
 简单的 LM Studio 测试脚本
 """
-import asyncio
-from mcp_server import LMStudioClient
+import sys
+import os
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+
+from pdf_translator.mcp_server import LMStudioClient
 
 async def main():
     """测试 LM Studio 连接和功能"""
